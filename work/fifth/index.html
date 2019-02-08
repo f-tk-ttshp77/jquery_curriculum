@@ -103,17 +103,16 @@
 
           if (selected == 'all') {
             $('.list').children().show();
-          }
-          else {
-              $('.list').children().hide();
+          } else {
+            $('.list').children().hide();
 
-              $('.list').children().each(function() {
-                var dataCategoryType = $(this).data('category-type');
+            $('.list').children().each(function(index, item) {
+              var dataCategoryType = $(item).data('category-type');
 
-                if (selected == dataCategoryType) {
-                  $(this).show();
-                }
-              })
+              if (selected == dataCategoryType) {
+                $(item).show();
+              }
+            })
           }
         })
       });

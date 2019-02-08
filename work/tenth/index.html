@@ -68,7 +68,7 @@
         var inputKeyword = '';
         var pageCounter;
 
-        function renderSearchResult(item) {
+        function RenderSearchResult(item) {
           var renderHTML = '';
 
           for (var i = 0; i < item.length; i++) {
@@ -77,24 +77,6 @@
             var title = item[i].Item.title;
             var author = item[i].Item.author;
             var publisherName = item[i].Item.publisherName;
-            // 冗長すぎるので、改行してヒアドキュメント的に書けないものか・・・
-            var insertHTML = '<li class="lists__item"><div class="lists__item__inner"><a class="lists__item__link" target="_blank" href="' + itemUrl + '"><img class="lists__item__img" src="' + largeImageUrl + '" alt="' + title + '" /><p class="lists__item__detail">作品名：' + title + '</p><p class="lists__item__detail">作者　：' + author + '</p><p class="lists__item__detail">出版社：' + publisherName + '</p></a></div></li>';
-            renderHTML += insertHTML;
-          }
-
-          $('.lists').html(renderHTML);
-        }
-
-        function renderNextResult(item) {
-          var renderHTML = '';
-
-          for (var i = 0; i < item.length; i++) {
-            var itemUrl = item[i].Item.itemUrl;
-            var largeImageUrl = item[i].Item.largeImageUrl;
-            var title = item[i].Item.title;
-            var author = item[i].Item.author;
-            var publisherName = item[i].Item.publisherName;
-            // 冗長すぎるので、改行してヒアドキュメント的に書けないものか・・・
             var insertHTML = '<li class="lists__item"><div class="lists__item__inner"><a class="lists__item__link" target="_blank" href="' + itemUrl + '"><img class="lists__item__img" src="' + largeImageUrl + '" alt="' + title + '" /><p class="lists__item__detail">作品名：' + title + '</p><p class="lists__item__detail">作者　：' + author + '</p><p class="lists__item__detail">出版社：' + publisherName + '</p></a></div></li>';
             renderHTML += insertHTML;
           }
@@ -102,10 +84,8 @@
           $('.lists').prepend(renderHTML);
         }
 
-        function newSearchAPI() {
-          pageCounter = 1;
+        function SearchAPI() {
           $(".message").hide();
-          $(".lists__item").hide();
           $.ajax({
             url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20170404',
             type: 'GET',
@@ -121,7 +101,8 @@
             if (Data.count == 0) {
               $(".search").after('<div class="message">検索結果が見つかりませんでした。<br>別のキーワードで検索してください。</div>');
             } else {
-              renderSearchResult(Data.Items);
+              RenderSearchResult(Data.Items);
+              console.log(Data);
             }
           })
           .fail(function() {
@@ -129,38 +110,16 @@
           })
         }
 
-        function nextSearchAPI() {
-          pageCounter++;
-          $(".message").hide();
-          $.ajax({
-            url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20170404',
-            type: 'GET',
-            datatype: 'json',
-            data: {
-              applicationId: '1019399324990976605',
-              booksGenreId: '001',
-              keyword: inputKeyword,
-              hits: 20,
-              page: pageCounter
-            }
-          }).done(function(Data, Status) {
-            if (Data.count == 0) {
-              $(".search").after('<div class="message">検索結果は以上です。</div>');
-            }　else {
-              renderNextResult(Data.Items);
-            }
-          }).fail(function() {
-            $(".search").after('<div class="message">通信エラー<br>問題が解決しない場合はお問い合わせください</div>');
-          })
-        }
-
         $('#js-search-button').on('click', function() {
           if ($('#js-search-word').val() == inputKeyword) {
             inputKeyword = $('#js-search-word').val();
-            nextSearchAPI();
+            pageCounter++;
+            SearchAPI();
           } else {
             inputKeyword = $('#js-search-word').val();
-            newSearchAPI();
+            pageCounter = 1;
+            $('.lists__item').hide();
+            SearchAPI();
           }
         })
       });
